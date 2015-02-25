@@ -352,12 +352,12 @@ class MixerChannelStrip():
         self._on_mute_changed()
         self._on_arm_changed()
 
-    def first_button_pressed(self):
+    def second_button_pressed(self):
         if self.__assigned_track:
             if self.__assigned_track in tuple(self.song().visible_tracks) + tuple(self.song().return_tracks):
                 self.__assigned_track.mute = not self.__assigned_track.mute
 
-    def second_button_pressed(self):
+    def first_button_pressed(self):
         if self.__assigned_track in self.song().visible_tracks:
             if self.__assigned_track.can_be_armed:
                 self.__mixer_controller.track_about_to_arm(self.__assigned_track)
@@ -366,15 +366,15 @@ class MixerChannelStrip():
                     self.__assigned_track.view.select_instrument() and self.__mixer_controller.set_selected_track(self.__assigned_track)
 
     def _on_mute_changed(self):
-        if self.__mixer_controller.support_mkII():
+        if self.__control_second_button and self.__mixer_controller.support_mkII():
             value = 0
             if self.__assigned_track in tuple(self.song().tracks) + tuple(self.song().return_tracks) and not self.__assigned_track.mute:
                 value = 1
-            self.__mixer_controller.remote_sl_parent().send_midi((self.__mixer_controller.cc_status_byte(), self.__index + MX_FIRST_BUTTON_ROW_BASE_CC, value))
+            self.__mixer_controller.remote_sl_parent().send_midi((self.__mixer_controller.cc_status_byte(), self.__index + MX_SECOND_BUTTON_ROW_BASE_CC, value))
 
     def _on_arm_changed(self):
-        if self.__control_second_button and self.__mixer_controller.support_mkII():
+        if self.__mixer_controller.support_mkII():
             value = 0
             if self.__assigned_track and self.__assigned_track in self.song().tracks and self.__assigned_track.can_be_armed and self.__assigned_track.arm:
                 value = 1
-            self.__mixer_controller.remote_sl_parent().send_midi((self.__mixer_controller.cc_status_byte(), self.__index + MX_SECOND_BUTTON_ROW_BASE_CC, value))
+            self.__mixer_controller.remote_sl_parent().send_midi((self.__mixer_controller.cc_status_byte(), self.__index + MX_FIRST_BUTTON_ROW_BASE_CC, value))
